@@ -1,0 +1,33 @@
+<?php
+
+namespace {{ namespace }}\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+{% if 'annotation' == format -%}
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+{% endif -%}
+use Tg\OkoaBundle\Controller\ControllerExtras;
+
+class DefaultController extends Controller
+{
+    use ControllerExtras;
+
+    {% if 'annotation' == format -%}
+    /**
+     * @Route("/hello/{name}")
+     * @Template
+     */
+    {% endif -%}
+    public function indexAction($name)
+    {
+        {% if 'annotation' != format -%}
+        return $this->render('{{ bundle }}:Default:index.html.twig', array('name' => $name));
+        {%- else -%}
+        return [
+            'name' => $name
+        ];
+        {%- endif %}
+
+    }
+}

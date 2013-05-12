@@ -1,0 +1,2 @@
+msgid "Symfony2 is great"
+msgstr "Symfony2 is geweldig"

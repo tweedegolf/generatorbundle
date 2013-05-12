@@ -9,10 +9,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class TgOkoaGeneratorBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function boot()
+    public function getParent()
     {
+        return 'SensioGeneratorBundle';
     }
 }
