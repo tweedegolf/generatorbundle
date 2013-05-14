@@ -1,0 +1,9 @@
+{% raw %}{% extends "::base.html.twig" %}{% endraw %}
+
+{% raw %}{% block title %}{% endraw %}
+    {{ bundle }}:{{ controller }}:{{ action.basename }}
+{% raw %}{% endblock %}{% endraw %}
+
+{% raw %}{% block body %}{% endraw %}
+    <h1>Welcome at the {{ controller }}:{{ action.basename }} page</h1>
+{% raw %}{% endblock %}{% endraw %}

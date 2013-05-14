@@ -23,6 +23,12 @@ class PasswordCommand extends ContainerAwareCommand
                'If set, a pronouncable password will be generated'
             )
             ->addOption(
+               'ask-salt',
+               null,
+               InputOption::VALUE_NONE,
+               'If set, you will be asked to enter a salt manually'
+            )
+            ->addOption(
                 'no-dashes',
                 'd',
                 InputOption::VALUE_NONE,
@@ -67,7 +73,12 @@ class PasswordCommand extends ContainerAwareCommand
         }
         if ($input->getOption('pronouncable')) {
             $binary = $this->getContainer()->getParameter('kernel.root_dir') . '/../bin/passogva.py';
-            $password = exec($binary . ' ' . $size);
+            if ($input->getOption('no-dashes')) {
+                $dashes = '-n';
+            } else {
+                $dashes = '-d';
+            }
+            $password = exec($binary . ' ' . $dashes . ' ' . $size);
             $this->showPassword($input, $output, $password);
         } else {
             if ($input->getOption('alphanumeric')) {
@@ -92,9 +103,13 @@ class PasswordCommand extends ContainerAwareCommand
     {
         if ($input->getOption('encode')) {
             $hashCommand = $this->getApplication()->find('generate:password:hash');
-            $input = new ArrayInput([
+            $inputArgs = [
                 'password' => $password,
-            ]);
+            ];
+            if ($input->getOption('ask-salt')) {
+                $inputArgs['--ask-salt'] = true;
+            }
+            $input = new ArrayInput($inputArgs);
             $hashCommand->run($input, $output);
             // $this->encodePassword($input, $output, $password);
         }

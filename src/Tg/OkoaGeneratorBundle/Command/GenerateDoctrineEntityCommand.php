@@ -4,22 +4,21 @@ namespace Tg\OkoaGeneratorBundle\Command;
 
 use Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineEntityCommand as BaseGenerateDoctrineEntityCommand;
 use Sensio\Bundle\GeneratorBundle\Generator\DoctrineEntityGenerator as BaseDoctrineEntityGenerator;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Tg\OkoaGeneratorBundle\Generator\DoctrineEntityGenerator;
 
 class GenerateDoctrineEntityCommand extends BaseGenerateDoctrineEntityCommand
 {
-    private $gen;
-
-    public function getGenerator()
+    /**
+     * {@inheritDoc}
+     */
+    public function execute(InputInterface $input, OutputInterface $output)
     {
-        if (null === $this->gen) {
-            $this->gen = new DoctrineEntityGenerator($this->getContainer()->get('filesystem'), $this->getContainer()->get('doctrine'));
-        }
-        return $this->gen;
-    }
-
-    public function setGenerator(BaseDoctrineEntityGenerator $generator)
-    {
-        $this->gen = $generator;
+        $this->setGenerator(new DoctrineEntityGenerator(
+            $this->getContainer()->get('filesystem'),
+            $this->getContainer()->get('doctrine')
+        ));
+        parent::execute($input, $output);
     }
 }
