@@ -1,5 +1,6 @@
 {
     "name": "tg/okoageneratorbundle",
+    "license": "MIT",
     "description": "Symfony generator bundle for Okoa",
     "authors": [
         {
