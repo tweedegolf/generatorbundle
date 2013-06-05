@@ -17,7 +17,7 @@ class GenerateBundleCommand extends BaseGenerateBundleCommand
     {
         $this->setGenerator(new BundleGenerator(
             $this->getContainer()->get('filesystem'),
-            __DIR__ . '/../Resources/skeleton/bundle'
+            __DIR__ . '/../Resources/skeleton/'
         ));
         parent::execute($input, $output);
     }

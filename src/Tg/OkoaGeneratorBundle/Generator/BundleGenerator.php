@@ -15,6 +15,7 @@ class BundleGenerator extends BaseBundleGenerator
     {
         $this->filesystem = $filesystem;
         $this->skeletonDir = $skeletonDir;
+        $this->setSkeletonDirs($this->skeletonDir);
     }
 
     public function generate($namespace, $bundle, $dir, $format, $structure)
@@ -42,28 +43,28 @@ class BundleGenerator extends BaseBundleGenerator
             'extension_alias' => Container::underscore($basename),
         );
 
-        $this->renderFile($this->skeletonDir, 'Bundle.php.twig', $dir.'/'.$bundle.'.php', $parameters);
-        $this->renderFile($this->skeletonDir, 'Extension.php.twig', $dir.'/DependencyInjection/'.$basename.'Extension.php', $parameters);
-        $this->renderFile($this->skeletonDir, 'Configuration.php.twig', $dir.'/DependencyInjection/Configuration.php', $parameters);
-        $this->renderFile($this->skeletonDir, 'DefaultController.php.twig', $dir.'/Controller/DefaultController.php', $parameters);
-        $this->renderFile($this->skeletonDir, 'DefaultControllerTest.php.twig', $dir.'/Tests/Controller/DefaultControllerTest.php', $parameters);
-        $this->renderFile($this->skeletonDir, 'index.html.twig.twig', $dir.'/Resources/views/Default/index.html.twig', $parameters);
+        $this->renderFile('bundle/Bundle.php.twig', $dir.'/'.$bundle.'.php', $parameters);
+        $this->renderFile('bundle/Extension.php.twig', $dir.'/DependencyInjection/'.$basename.'Extension.php', $parameters);
+        $this->renderFile('bundle/Configuration.php.twig', $dir.'/DependencyInjection/Configuration.php', $parameters);
+        $this->renderFile('bundle/DefaultController.php.twig', $dir.'/Controller/DefaultController.php', $parameters);
+        $this->renderFile('bundle/DefaultControllerTest.php.twig', $dir.'/Tests/Controller/DefaultControllerTest.php', $parameters);
+        $this->renderFile('bundle/index.html.twig.twig', $dir.'/Resources/views/Default/index.html.twig', $parameters);
 
         if ('yml' === $format || 'annotation' === $format) {
-            $this->renderFile($this->skeletonDir, 'services.yml.twig', $dir.'/Resources/config/services.yml', $parameters);
+            $this->renderFile('bundle/services.yml.twig', $dir.'/Resources/config/services.yml', $parameters);
         } else {
-            $this->renderFile($this->skeletonDir, 'services.'.$format.'.twig', $dir.'/Resources/config/services.'.$format, $parameters);
+            $this->renderFile('bundle/services.'.$format.'.twig', $dir.'/Resources/config/services.'.$format, $parameters);
         }
 
         if ('annotation' !== $format) {
-            $this->renderFile($this->skeletonDir, 'routing.'.$format.'.twig', $dir.'/Resources/config/routing.'.$format, $parameters);
+            $this->renderFile('bundle/routing.'.$format.'.twig', $dir.'/Resources/config/routing.'.$format, $parameters);
         }
 
         if ($structure) {
             $this->filesystem->mkdir($dir.'/Resources/doc');
             $this->filesystem->touch($dir.'/Resources/doc/index.rst');
             $this->filesystem->mkdir($dir.'/Resources/translations');
-            $this->filesystem->copy($this->skeletonDir.'/messages.nl.po', $dir.'/Resources/translations/messages.nl.po');
+            $this->filesystem->copy($this->skeletonDir.'bundle/messages.nl.po', $dir.'/Resources/translations/messages.nl.po');
             $this->filesystem->mkdir($dir.'/Resources/public/css');
             $this->filesystem->mkdir($dir.'/Resources/public/images');
             $this->filesystem->mkdir($dir.'/Resources/public/js');
