@@ -1,6 +1,6 @@
 {
-    "name": "tg/okoageneratorbundle",
-    "homepage": "https://bitbucket.org/tweedegolf/okoageneratorbundle",
+    "name": "tweedegolf/generatorbundle",
+    "homepage": "https://github.com/tweedegolf/generatorbundle",
     "license": "MIT",
     "description": "Symfony generator bundle for Okoa",
     "authors": [
