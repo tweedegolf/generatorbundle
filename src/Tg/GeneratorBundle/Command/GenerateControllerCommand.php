@@ -1,6 +1,6 @@
 <?php
 
-namespace Tg\OkoaGeneratorBundle\Command;
+namespace Tg\GeneratorBundle\Command;
 
 use Sensio\Bundle\GeneratorBundle\Command\GenerateControllerCommand as BaseGenerateControllerCommand;
 use Sensio\Bundle\GeneratorBundle\Generator\ControllerGenerator;

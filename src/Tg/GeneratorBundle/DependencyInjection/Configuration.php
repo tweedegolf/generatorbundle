@@ -1,6 +1,6 @@
 <?php
 
-namespace Tg\OkoaGeneratorBundle\DependencyInjection;
+namespace Tg\GeneratorBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('okoa_generator');
+        $rootNode = $treeBuilder->root('tg_generator');
 
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for

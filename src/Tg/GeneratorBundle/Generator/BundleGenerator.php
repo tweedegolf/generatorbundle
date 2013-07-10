@@ -1,6 +1,6 @@
 <?php
 
-namespace Tg\OkoaGeneratorBundle\Generator;
+namespace Tg\GeneratorBundle\Generator;
 
 use Sensio\Bundle\GeneratorBundle\Generator\BundleGenerator as BaseBundleGenerator;
 use Symfony\Component\Filesystem\Filesystem;

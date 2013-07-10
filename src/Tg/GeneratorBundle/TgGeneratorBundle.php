@@ -1,13 +1,13 @@
 <?php
 
-namespace Tg\OkoaGeneratorBundle;
+namespace Tg\GeneratorBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Okoa generator bundle
  */
-class TgOkoaGeneratorBundle extends Bundle
+class TgGeneratorBundle extends Bundle
 {
     public function getParent()
     {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Tg\OkoaGeneratorBundle\Command;
+namespace Tg\GeneratorBundle\Command;
 
 use Sensio\Bundle\GeneratorBundle\Command\GenerateBundleCommand as BaseGenerateBundleCommand;
 use Sensio\Bundle\GeneratorBundle\Generator\BundleGenerator as BaseBundleGenerator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Tg\OkoaGeneratorBundle\Generator\BundleGenerator;
+use Tg\GeneratorBundle\Generator\BundleGenerator;
 
 class GenerateBundleCommand extends BaseGenerateBundleCommand
 {

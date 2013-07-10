@@ -1,9 +1,9 @@
 <?php
 
-namespace Tg\OkoaGeneratorBundle\Generator;
+namespace Tg\GeneratorBundle\Generator;
 
 use Sensio\Bundle\GeneratorBundle\Generator\DoctrineEntityGenerator as BaseDoctrineEntityGenerator;
-use Tg\OkoaGeneratorBundle\Generator\EntityGenerator;
+use Tg\GeneratorBundle\Generator\EntityGenerator;
 
 class DoctrineEntityGenerator extends BaseDoctrineEntityGenerator
 {

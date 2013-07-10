@@ -1,6 +1,6 @@
 <?php
 
-namespace Tg\OkoaGeneratorBundle\Command;
+namespace Tg\GeneratorBundle\Command;
 
 use InvalidArgumentException;
 use ReflectionClass;

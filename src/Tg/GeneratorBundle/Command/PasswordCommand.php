@@ -1,6 +1,6 @@
 <?php
 
-namespace Tg\OkoaGeneratorBundle\Command;
+namespace Tg\GeneratorBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;

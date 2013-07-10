@@ -1,6 +1,6 @@
 <?php
 
-namespace Tg\OkoaGeneratorBundle\Generator;
+namespace Tg\GeneratorBundle\Generator;
 
 use Doctrine\ORM\Tools\EntityGenerator as BaseEntityGenerator;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -35,19 +35,19 @@ use Tg\OkoaBundle\Behavior\Persistable;
 
     public function generateEntityClass(ClassMetadataInfo $metadata)
     {
-        $placeHolders = array(
+        $placeHolders = [
             '<namespace>',
             '<entityAnnotation>',
             '<entityClassName>',
             '<entityBody>'
-        );
+        ];
 
-        $replacements = array(
+        $replacements = [
             $this->generateEntityNamespace($metadata),
             $this->generateEntityDocBlock($metadata),
             $this->generateEntityClassName($metadata),
             $this->generateEntityBody($metadata)
-        );
+        ];
 
         $code = str_replace($placeHolders, $replacements, self::$classTemplate);
 
