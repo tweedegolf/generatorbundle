@@ -28,7 +28,7 @@ class PasswordCommand extends ContainerAwareCommand
                 'method',
                 'm',
                 InputOption::VALUE_REQUIRED,
-                'Method to be used for password generation: random, alphanumeric, pronouncable, diceware'
+                'Method to be used for password generation: random, alphanumeric, pronounceable, diceware'
             )
             ->addOption(
                 'divider',
@@ -71,7 +71,7 @@ class PasswordCommand extends ContainerAwareCommand
             $available = [
                 'random' => "Random string of characters",
                 'alphanumeric' => "Random string consisting only of alphanumeric characters",
-                'pronouncable' => "A pronouncable string (slower)",
+                'pronounceable' => "A pronouncable string (slower)",
                 'diceware' => "Randomly selects words from a wordlist"
             ];
             $method = $dialog->select(
@@ -90,7 +90,7 @@ class PasswordCommand extends ContainerAwareCommand
             case 'alphanumeric':
                 $generator = new Password\GarbageGenerator($this->getRandomGenerator(), Password\GarbageGenerator::ALNUM);
                 break;
-            case 'pronouncable':
+            case 'pronounceable':
                 $generator = new Password\Fips181Generator($this->getRandomGenerator());
                 $generator->setSeparator($input->getOption('divider'));
                 break;

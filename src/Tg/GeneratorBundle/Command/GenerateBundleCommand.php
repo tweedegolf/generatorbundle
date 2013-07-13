@@ -15,10 +15,15 @@ class GenerateBundleCommand extends BaseGenerateBundleCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->setGenerator(new BundleGenerator(
-            $this->getContainer()->get('filesystem'),
-            __DIR__ . '/../Resources/skeleton/'
-        ));
+        $this->setGenerator(new BundleGenerator($this->getContainer()->get('filesystem')));
+        $this->getGenerator()->setSkeletonDirs($this->getSkeletonDirs());
         parent::execute($input, $output);
+    }
+
+    protected function getSkeletonDirs($bundle = null)
+    {
+        return [
+            __DIR__ . '/../Resources/skeleton',
+        ];
     }
 }

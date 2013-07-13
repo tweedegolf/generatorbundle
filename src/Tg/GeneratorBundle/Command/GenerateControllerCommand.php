@@ -14,10 +14,13 @@ class GenerateControllerCommand extends BaseGenerateControllerCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->setGenerator(new ControllerGenerator(
-            $this->getContainer()->get('filesystem'),
-            __DIR__ . '/../Resources/skeleton/controller'
-        ));
         parent::execute($input, $output);
+    }
+
+    protected function getSkeletonDirs($bundle = null)
+    {
+        return [
+            __DIR__ . '/../Resources/skeleton',
+        ];
     }
 }

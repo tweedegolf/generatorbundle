@@ -11,11 +11,10 @@ class BundleGenerator extends BaseBundleGenerator
     private $filesystem;
     private $skeletonDir;
 
-    public function __construct(Filesystem $filesystem, $skeletonDir)
+    public function __construct(Filesystem $filesystem)
     {
+        parent::__construct($filesystem);
         $this->filesystem = $filesystem;
-        $this->skeletonDir = $skeletonDir;
-        $this->setSkeletonDirs($this->skeletonDir);
     }
 
     public function generate($namespace, $bundle, $dir, $format, $structure)
@@ -64,10 +63,10 @@ class BundleGenerator extends BaseBundleGenerator
             $this->filesystem->mkdir($dir.'/Resources/doc');
             $this->filesystem->touch($dir.'/Resources/doc/index.rst');
             $this->filesystem->mkdir($dir.'/Resources/translations');
-            $this->filesystem->copy($this->skeletonDir.'bundle/messages.nl.po', $dir.'/Resources/translations/messages.nl.po');
-            $this->filesystem->mkdir($dir.'/Resources/public/css');
+            $this->renderFile('bundle/messages.nl.po', $dir.'/Resources/translations/messages.nl.po', $parameters);
+            $this->filesystem->mkdir($dir.'/Resources/less');
             $this->filesystem->mkdir($dir.'/Resources/public/images');
-            $this->filesystem->mkdir($dir.'/Resources/public/js');
+            $this->filesystem->mkdir($dir.'/Resources/js');
         }
     }
 }
