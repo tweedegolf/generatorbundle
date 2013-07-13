@@ -3,6 +3,7 @@
 namespace Tg\GeneratorBundle\Generator\Password;
 
 use LogicException;
+use Symfony\Component\Security\Core\Util\SecureRandomInterface;
 
 class GarbageGenerator extends AbstractPasswordGenerator
 {
@@ -19,7 +20,7 @@ class GarbageGenerator extends AbstractPasswordGenerator
 
     private $chars = [];
 
-    public function __construct($set = self::ALL, $rng = null)
+    public function __construct(SecureRandomInterface $rng, $set = self::ALL)
     {
         parent::__construct($rng);
 
@@ -46,14 +47,14 @@ class GarbageGenerator extends AbstractPasswordGenerator
         if (count($chars) < 1) {
             throw new LogicException("Too few characters to use for generating passwords");
         }
-        $this->chars = str_split($chars, 1);
+        $this->chars = $chars;
     }
 
     public function generate($length)
     {
         $pwd = "";
         while (strlen($pwd) < $length) {
-            $pwd += $this->chooseRandom($this->chars);
+            $pwd .= $this->chooseRandom($this->chars);
         }
         return $pwd;
     }

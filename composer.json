@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-
+        "symfony/symfony": ">= 2.3.0",
+        "tweedegolf/okoabundle": ">= 0.7.5"
     },
     "autoload": {
         "psr-0": { "": "src/" }

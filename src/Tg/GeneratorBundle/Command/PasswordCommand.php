@@ -2,12 +2,14 @@
 
 namespace Tg\GeneratorBundle\Command;
 
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Tg\GeneratorBundle\Generator\Password;
 
 class PasswordCommand extends ContainerAwareCommand
 {
@@ -17,34 +19,36 @@ class PasswordCommand extends ContainerAwareCommand
             ->setName('generate:password')
             ->setDescription('Generate a random password')
             ->addOption(
-               'pronouncable',
-               'p',
-               InputOption::VALUE_NONE,
-               'If set, a pronouncable password will be generated'
-            )
-            ->addOption(
                'ask-salt',
                null,
                InputOption::VALUE_NONE,
                'If set, you will be asked to enter a salt manually'
             )
             ->addOption(
-                'no-dashes',
+                'method',
+                'm',
+                InputOption::VALUE_REQUIRED,
+                'Method to be used for password generation: random, alphanumeric, pronouncable, diceware'
+            )
+            ->addOption(
+                'divider',
                 'd',
-                InputOption::VALUE_NONE,
-                'If set, does not add dashes to a pronouncable password'
+                InputOption::VALUE_REQUIRED,
+                'Divider character for some password generation schemes',
+                '-'
+            )
+            ->addOption(
+                'lang',
+                'l',
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Language to be used for diceware scheme',
+                ['english']
             )
             ->addOption(
                 'encode',
                 'c',
                 InputOption::VALUE_NONE,
                 'If set, also generate an encoded hash'
-            )
-            ->addOption(
-                'alphanumeric',
-                'a',
-                InputOption::VALUE_NONE,
-                'If set, only use alphanumeric characters'
             )
             ->addArgument(
                 'size',
@@ -61,6 +65,40 @@ class PasswordCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $dialog = $this->getHelperSet()->get('dialog');
+        $method = $input->getOption('method');
+        if ($method === null) {
+            $available = [
+                'random' => "Random string of characters",
+                'alphanumeric' => "Random string consisting only of alphanumeric characters",
+                'pronouncable' => "A pronouncable string (slower)",
+                'diceware' => "Randomly selects words from a wordlist"
+            ];
+            $method = $dialog->select(
+                $output,
+                '<question>Please pick a valid method:</question>',
+                $available,
+                0,
+                false,
+                'Please pick a valid method'
+            );
+        }
+        switch ($method) {
+            case 'random':
+                $generator = new Password\GarbageGenerator($this->getRandomGenerator(), Password\GarbageGenerator::ALL);
+                break;
+            case 'alphanumeric':
+                $generator = new Password\GarbageGenerator($this->getRandomGenerator(), Password\GarbageGenerator::ALNUM);
+                break;
+            case 'pronouncable':
+                $generator = new Password\Fips181Generator($this->getRandomGenerator());
+                $generator->setSeparator($input->getOption('divider'));
+                break;
+            case 'diceware':
+                $generator = new Password\DicewareGenerator($this->getRandomGenerator(), $this->getContainer()->get('kernel'), $input->getOption('lang'));
+                $generator->setSeparator($input->getOption('divider'));
+                break;
+        }
         $size = $input->getArgument('size');
         if ($size === null) {
             $size = 20;
@@ -68,35 +106,8 @@ class PasswordCommand extends ContainerAwareCommand
             $size = (int)$size;
         }
 
-        if ($size < 1) {
-            throw new RuntimeException("Password size must be at least 1");
-        }
-        if ($input->getOption('pronouncable')) {
-            $binary = $this->getContainer()->getParameter('kernel.root_dir') . '/../bin/passogva.py';
-            if ($input->getOption('no-dashes')) {
-                $dashes = '-n';
-            } else {
-                $dashes = '-d';
-            }
-            $password = exec($binary . ' ' . $dashes . ' ' . $size);
-            $this->showPassword($input, $output, $password);
-        } else {
-            if ($input->getOption('alphanumeric')) {
-                $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-            } else {
-                $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()-+_=[]{};:\\|,.<>/?';
-            }
-            $nchars = strlen($chars);
-            $bytes = str_split($this->getRandomGenerator()->nextBytes($size));
-
-            $password = '';
-            foreach ($bytes as $byte) {
-                $n = ord($byte);
-                $n = (int)floor($n * ($nchars / 256));
-                $password .= $chars[$n];
-            }
-            $this->showPassword($input, $output, $password);
-        }
+        $password = $generator->generate($size);
+        $this->showPassword($input, $output, $password);
     }
 
     protected function showPassword(InputInterface $input, OutputInterface $output, $password)
@@ -111,7 +122,6 @@ class PasswordCommand extends ContainerAwareCommand
             }
             $input = new ArrayInput($inputArgs);
             $hashCommand->run($input, $output);
-            // $this->encodePassword($input, $output, $password);
         }
         $output->writeln("<info>Generated password:</info>");
         $output->writeln($password);
