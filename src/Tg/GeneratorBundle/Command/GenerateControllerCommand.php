@@ -6,6 +6,7 @@ use Sensio\Bundle\GeneratorBundle\Command\GenerateControllerCommand as BaseGener
 use Sensio\Bundle\GeneratorBundle\Generator\ControllerGenerator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class GenerateControllerCommand extends BaseGenerateControllerCommand
 {
@@ -17,7 +18,7 @@ class GenerateControllerCommand extends BaseGenerateControllerCommand
         parent::execute($input, $output);
     }
 
-    protected function getSkeletonDirs($bundle = null)
+    protected function getSkeletonDirs(BundleInterface $bundle = null)
     {
         return [
             __DIR__ . '/../Resources/skeleton',
