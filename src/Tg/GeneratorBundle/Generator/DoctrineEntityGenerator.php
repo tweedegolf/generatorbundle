@@ -12,7 +12,7 @@ class DoctrineEntityGenerator extends BaseDoctrineEntityGenerator
         $entityGenerator = new EntityGenerator();
         // $entityGenerator->setClassToExtend('Tg\OkoaBundle\Behavior\Persistable');
         $entityGenerator->setGenerateAnnotations(false);
-        $entityGenerator->setGenerateStubMethods(false);
+        $entityGenerator->setGenerateStubMethods(true);
         $entityGenerator->setRegenerateEntityIfExists(false);
         $entityGenerator->setUpdateEntityIfExists(true);
         $entityGenerator->setNumSpaces(4);

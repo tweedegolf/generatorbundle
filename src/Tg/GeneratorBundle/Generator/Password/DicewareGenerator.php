@@ -43,7 +43,7 @@ class DicewareGenerator extends AbstractPasswordGenerator
                 $line = $this->chooseRandom($lines);
                 $parts = explode(' ', $line);
                 array_shift($parts);
-                $phrase[] = $this->chooseRandom($parts);
+                $phrase[] = trim($this->chooseRandom($parts));
             }
         }
         return implode($this->separator, $phrase);
