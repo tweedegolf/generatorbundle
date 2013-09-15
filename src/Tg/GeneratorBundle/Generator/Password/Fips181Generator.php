@@ -55,6 +55,12 @@ class Fips181Generator extends AbstractPasswordGenerator
             'a', 'e', 'i', 'o', 'u', 'y',
         ];
 
+        $this->generateGramRules();
+        $this->generateDigramRules();
+    }
+
+    public function generateGramRules()
+    {
         // gram rules
         $this->gramRules = [];
         foreach ($this->grams as $gram) {
@@ -67,7 +73,10 @@ class Fips181Generator extends AbstractPasswordGenerator
         $this->gramRules['y'] |= self::ALTERNATE_VOWEL;
         $this->gramRules['x'] = self::NOT_BEGIN_SYLLABLE;
         $this->gramRules['ck'] = self::NOT_BEGIN_SYLLABLE;
+    }
 
+    public function generateDigramRules()
+    {
         // digram rules
         $this->digramRules = [];
         $this->digramRules['a'] = [];
