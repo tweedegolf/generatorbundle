@@ -2,9 +2,7 @@
 
 namespace Tg\GeneratorBundle\Generator\Password;
 
-use LogicException;
 use Symfony\Component\Security\Core\Util\SecureRandomInterface;
-use Tg\OkoaBundle\Util\PathUtil;
 
 class Fips181Generator extends AbstractPasswordGenerator
 {
@@ -1352,7 +1350,6 @@ class Fips181Generator extends AbstractPasswordGenerator
 
         do {
             $tries = 0;
-            $unit = '';
             $lastUnit = '';
             $savedPair = $holdSavedPair;
             $syllable = '';
@@ -1361,8 +1358,6 @@ class Fips181Generator extends AbstractPasswordGenerator
             $currentUnit = 0;
             $lengthLeft = $length;
             $wantAnotherUnit = true;
-            $wantVowel = false;
-            $ruleBroken = false;
 
             do {
                 $wantVowel = false;
@@ -1497,8 +1492,6 @@ class Fips181Generator extends AbstractPasswordGenerator
                         $unitsInSyllable[$currentUnit] = $unit;
                         $syllable .= $unit;
                     }
-                } else {
-                    $roleBroken = true;
                 }
                 $currentUnit += 1;
             } while ($tries <= $maxRetries && $wantAnotherUnit);
@@ -1562,7 +1555,6 @@ class Fips181Generator extends AbstractPasswordGenerator
 
     private function getRandomUnit($type)
     {
-        // TODO
         if ($type & self::VOWEL) {
             return $this->chooseRandom($this->vowelGrams);
         } else {
@@ -1572,7 +1564,6 @@ class Fips181Generator extends AbstractPasswordGenerator
 
     private function isImproperWord($units)
     {
-        $failure = false;
         foreach ($units as $unitCount => $unit) {
             if ($unitCount > 0 && $this->digramRules[$units[$unitCount - 1]][$unit] & self::ILLEGAL_PAIR) {
                 return true;
@@ -1618,7 +1609,7 @@ class Fips181Generator extends AbstractPasswordGenerator
     private function haveFinalSplit($units)
     {
         $vowelCount = 0;
-        foreach ($units as $unitCount => $unit) {
+        foreach ($units as $unit) {
             if ($this->gramRules[$unit] & self::VOWEL) {
                 $vowelCount += 1;
             }
