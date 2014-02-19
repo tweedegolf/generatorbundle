@@ -1,8 +1,8 @@
 {
     "name": "tweedegolf/generatorbundle",
     "homepage": "https://github.com/tweedegolf/generatorbundle",
-    "license": "MIT",
     "description": "Symfony integration for tweedegolf/generator",
+    "license": "MIT",
     "authors": [
         {
             "name": "Ruben Nijveld",
@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "symfony/symfony": ">= 2.3.0",
+        "symfony/symfony": "~2.4",
         "tweedegolf/generator": "dev-master"
     },
     "autoload": {
