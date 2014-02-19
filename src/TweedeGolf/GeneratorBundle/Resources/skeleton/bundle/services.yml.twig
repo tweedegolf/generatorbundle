@@ -1,0 +1,12 @@
+# parameters:
+#     {{ input.alias }}.example.class: {{ input.namespace }}\Some\Example
+#
+# services:
+#     {{ input.alias }}.example:
+#         class: %{{ input.alias }}.example.class%
+#         arguments:
+#             - @some.example.service
+#         calls:
+#             - [setExample, [%some.example.parameter%]]
+#         tags:
+#             - { name: some.tag, optional: argument }

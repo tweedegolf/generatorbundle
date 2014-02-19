@@ -2,7 +2,7 @@
     "name": "tweedegolf/generatorbundle",
     "homepage": "https://github.com/tweedegolf/generatorbundle",
     "license": "MIT",
-    "description": "Symfony generator bundle for Okoa",
+    "description": "Symfony integration for tweedegolf/generator",
     "authors": [
         {
             "name": "Ruben Nijveld",
@@ -11,9 +11,11 @@
     ],
     "require": {
         "symfony/symfony": ">= 2.3.0",
-        "tweedegolf/okoabundle": ">= 0.7.5"
+        "tweedegolf/generator": "dev-master"
     },
     "autoload": {
-        "psr-0": { "": "src/" }
+        "psr-4": {
+            "TweedeGolf\\GeneratorBundle\\": "src/TweedeGolf/GeneratorBundle/"
+        }
     }
 }
