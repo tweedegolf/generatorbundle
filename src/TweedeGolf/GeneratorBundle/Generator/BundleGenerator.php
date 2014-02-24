@@ -4,6 +4,7 @@ namespace TweedeGolf\GeneratorBundle\Generator;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Validator\Constraints;
 use TweedeGolf\Generator\AbstractGenerator;
 use TweedeGolf\Generator\Builder\BuilderInterface;
@@ -138,6 +139,7 @@ class BundleGenerator extends AbstractGenerator
 
         $arguments['dir'] = $folder . str_replace('\\', '/', $arguments['namespace']) . '/';
         $arguments['basename'] = substr($arguments['name'], 0, -6);
+        $arguments['alias'] = Container::underscore($arguments['basename']);
     }
 
     /**

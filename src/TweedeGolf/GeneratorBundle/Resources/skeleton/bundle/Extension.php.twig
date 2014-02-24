@@ -1,6 +1,6 @@
 <?php
 
-namespace {{input.namespace}}\DependencyInjection;
+namespace {{ args.namespace }}\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Loader;
  *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  */
-class {{ input.basename }}Extension extends Extension
+class {{ args.basename }}Extension extends Extension
 {
     /**
      * {@inheritDoc}

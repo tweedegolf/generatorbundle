@@ -1,9 +1,9 @@
 # parameters:
-#     {{ input.alias }}.example.class: {{ input.namespace }}\Some\Example
+#     {{ args.alias }}.example.class: {{ args.namespace }}\Some\Example
 #
 # services:
-#     {{ input.alias }}.example:
-#         class: %{{ input.alias }}.example.class%
+#     {{ args.alias }}.example:
+#         class: %{{ args.alias }}.example.class%
 #         arguments:
 #             - @some.example.service
 #         calls:
