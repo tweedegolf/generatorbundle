@@ -12,6 +12,8 @@ class IsNamespaceValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        // TODO: Implement validate() method.
+        if (1 !== preg_match('/^[a-z][a-z0-9_]*(\\\\[a-z][a-z0-9_]*)*$/i', $value)) {
+            $this->context->addViolation($constraint->message, ['%string%' => $value], $value);
+        }
     }
 }

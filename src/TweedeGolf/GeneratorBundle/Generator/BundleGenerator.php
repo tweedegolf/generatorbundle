@@ -28,7 +28,7 @@ class BundleGenerator extends AbstractGenerator
             ->addOption('structure', null, InputOption::VALUE_NONE, 'Generate some default directories')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the bundle')
             ->addOption('folder', null, InputOption::VALUE_REQUIRED, 'Folder in which to generate the bundle', 'src/')
-            ->addArgument('namespace', InputArgument::REQUIRED)
+            ->addArgument('namespace', InputArgument::REQUIRED, 'Namespace of the bundle')
         ;
     }
 
@@ -107,6 +107,9 @@ class BundleGenerator extends AbstractGenerator
 
         // lets start interacting
         $questioner->update($arguments, 'namespace', 'string', [
+            'modify' => function ($value) {
+                return str_replace('/', '\\', $value);
+            },
             'description' =>
                 'The namespace of the bundle that is about to be created. Bundle namespaces should have at least ' .
                 'a vendor prefix. The namespace must end with `Bundle` in order to be considered valid.' . "\n\n" .
