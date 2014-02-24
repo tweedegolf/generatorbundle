@@ -94,23 +94,60 @@ class BundleGenerator extends AbstractGenerator
      */
     public function interact(Arguments $arguments, Questioner $questioner)
     {
-        $questioner->update($arguments, 'namespace', 'namespace');
+        $questioner->messageBlock(
+            'This is the interactive version of the bundle generator. This generator will generate the basic ' .
+            'scaffolding for your bundle, containing a Bundle class with related Extension and Configuration ' .
+            'classes. An empty service configuration will also be generated. If indicated, some of the basic ' .
+            'structure of the bundle can be generated.',
+            null,
+            'bg=green;fg=black',
+            true
+        );
+        $questioner->writeln();
+
+        // lets start interacting
+        $questioner->update($arguments, 'namespace', 'string', [
+            'description' =>
+                'The namespace of the bundle that is about to be created. Bundle namespaces should have at least ' .
+                'a vendor prefix. The namespace must end with `Bundle` in order to be considered valid.' . "\n\n" .
+                'An example correct namespace is: `Acme\\ExampleBundle`. You may optionally use the slash `/` ' .
+                'character instead of the backslash `\\` as a namespace separator.'
+        ]);
 
         $questioner->update($arguments, 'name', 'string', [
             'default' => $this->getNameForNamespace($arguments['namespace']),
-            'description' => ''
+            'description' =>
+                'The name of the bundle, by default this is the namespace with the separator symbols removed. ' .
+                'Note that the bundle name has to end with `Bundle`.'
+        ]);
+
+        $questioner->update($arguments, 'folder', 'string', [
+            'description' =>
+                'The source folder in which the bundle should be generated. This path is relative to the root of ' .
+                'the application.'
         ]);
 
         $questioner->update($arguments, 'update-kernel', 'boolean', [
             'force' => true,
+            'description' =>
+                'This generator can update app/AppKernel.php automatically to include the newly generated bundle. ' .
+                'Note that for this function to work, the AppKernel needs to look relatively similar to the default ' .
+                'kernel coding style.'
         ]);
         $questioner->update($arguments, 'update-routing', 'boolean', [
             'force' => true,
+            'description' =>
+                'This generator can automatically add the routing of this bundle to the application routing file. ' .
+                'The new bundle will be prepended to the routing file.'
         ]);
 
         $questioner->update($arguments, 'structure', 'boolean', [
             'force' => true,
-            'prompt' => 'Generate bundle structure?'
+            'description' =>
+                'Some additional directories and standard files can be generated. These are some default folders for ' .
+                'often used components in a bundle. Mainly this generates some resource folders, ' .
+                'entity and controller directories.',
+            'prompt' => 'Generate bundle structure'
         ]);
     }
 
