@@ -31,14 +31,6 @@ class EntityGenerator extends AbstractGenerator
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function prepare(Arguments $arguments)
-    {
-        // TODO: Implement prepare() method.
-    }
-
-    /**
      * Interact with the user to retrieve the rest of the arguments.
      * @param Arguments  $arguments Arguments already known.
      * @param Questioner $questioner
