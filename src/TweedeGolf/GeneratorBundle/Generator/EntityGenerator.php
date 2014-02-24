@@ -2,56 +2,58 @@
 
 namespace TweedeGolf\GeneratorBundle\Generator;
 
-use Doctrine\ORM\Tools\EntityGenerator as BaseEntityGenerator;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Symfony\Component\Validator\Constraint;
+use TweedeGolf\Generator\AbstractGenerator;
+use TweedeGolf\Generator\Builder\BuilderInterface;
+use TweedeGolf\Generator\Console\Questioner;
+use TweedeGolf\Generator\Dispatcher\GeneratorDispatcherInterface;
+use TweedeGolf\Generator\Input\Arguments;
 
-class EntityGenerator extends BaseEntityGenerator
+class EntityGenerator extends AbstractGenerator
 {
     /**
-     * @var string
+     * {@inheritdoc}
      */
-    protected $fieldVisibility = 'private';
-
-    /**
-     * @var string
-     */
-    protected static $classTemplate =
-'<?php
-
-<namespace>
-
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Symfony\Component\Validator\Constraints as Assert;
-use Tg\OkoaBundle\Behavior\Persistable;
-
-<entityAnnotation>
-<entityClassName> extends Persistable
-{
-<entityBody>
-}
-';
-
-    public function generateEntityClass(ClassMetadataInfo $metadata)
+    public function configure()
     {
-        $placeHolders = [
-            '<namespace>',
-            '<entityAnnotation>',
-            '<entityClassName>',
-            '<entityBody>'
-        ];
+        $this
+            ->setName('entity')
+            ->setDescription('Generate a Doctrine ORM entity')
+        ;
+    }
 
-        $replacements = [
-            $this->generateEntityNamespace($metadata),
-            $this->generateEntityDocBlock($metadata),
-            $this->generateEntityClassName($metadata),
-            $this->generateEntityBody($metadata)
-        ];
+    /**
+     * {@inheritdoc}
+     */
+    public function generate(Arguments $arguments, BuilderInterface $builder, GeneratorDispatcherInterface $dispatcher)
+    {
+        // TODO: Implement generate() method.
+    }
 
-        $code = str_replace($placeHolders, $replacements, self::$classTemplate);
+    /**
+     * {@inheritdoc}
+     */
+    public function prepare(Arguments $arguments)
+    {
+        // TODO: Implement prepare() method.
+    }
 
-        return str_replace('<spaces>', $this->spaces, $code);
+    /**
+     * Interact with the user to retrieve the rest of the arguments.
+     * @param Arguments  $arguments Arguments already known.
+     * @param Questioner $questioner
+     */
+    public function interact(Arguments $arguments, Questioner $questioner)
+    {
+        // TODO: Implement interact() method.
+    }
+
+    /**
+     * Return the constraints for the arguments of the generator.
+     * @return Constraint[]
+     */
+    public function getConstraints()
+    {
+        // TODO: Implement getConstraints() method.
     }
 }

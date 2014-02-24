@@ -2,111 +2,165 @@
 
 namespace TweedeGolf\GeneratorBundle\Generator;
 
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\Container;
-use TweedeGolf\GeneratorBundle\Exception\InvalidValueException;
-use TweedeGolf\GeneratorBundle\Generator\Builder\BuilderInterface;
-use TweedeGolf\GeneratorBundle\Generator\Input;
-use TweedeGolf\GeneratorBundle\Generator\Input\InputResult;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Validator\Constraints;
+use TweedeGolf\Generator\AbstractGenerator;
+use TweedeGolf\Generator\Builder\BuilderInterface;
+use TweedeGolf\Generator\Console\Questioner;
+use TweedeGolf\Generator\Dispatcher\GeneratorDispatcherInterface;
+use TweedeGolf\Generator\Input\Arguments;
+use TweedeGolf\GeneratorBundle\Validator\Constraints as GeneratorConstraints;
 
 class BundleGenerator extends AbstractGenerator
 {
-    private function getNamespaceDefinition()
-    {
-        $bundle = new Input\PhpNamespaceType('namespace', 'The namespace of the bundle.');
-        $bundle->addTransformer(function ($value) {
-            if (substr_count($value, '\\') < 1) {
-                throw new InvalidValueException(
-                    "Namespace '{$value}' does not comply with 'Vendor\\NameBundle' format."
-                );
-            }
-
-            if (substr($value, -6) !== 'Bundle') {
-                throw new InvalidValueException("Namespace '{$value}' must end with 'Bundle'.");
-            }
-            return $value;
-        });
-        return $bundle;
-    }
-
-    private function getBundleNameDefinition()
-    {
-        $name = new Input\StringType('name', 'Bundle class name', Input\InputTypeInterface::OPTIONAL);
-        $name->addTransformer(function ($value) {
-            if (substr($value, -6) !== 'Bundle') {
-                throw new InvalidValueException("Bundle name '{$value}' must end with 'Bundle'.");
-            }
-        });
-        return $name;
-    }
-
-    private function getFolderDefinition()
-    {
-        $folder = new Input\StringType('folder', 'Folder for code generation', Input\InputTypeInterface::OPTIONAL, 'src/');
-        $folder->addTransformer(function ($value) {
-            $value = str_replace('\\', '/', $value);
-            if ($value[0] === '/') {
-                $value = substr($value, 1);
-            }
-
-            if ($value[strlen($value) - 1] !== '/') {
-                $value .= '/';
-            }
-            return $value;
-        });
-        return $folder;
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     public function configure()
     {
         $this
             ->setName('bundle')
             ->setDescription('Generate a bundle')
-            ->withConfirmation()
-            ->add($this->getNamespaceDefinition())
-            ->add($this->getBundleNameDefinition())
-            ->add($this->getFolderDefinition())
-            ->add(new Input\NegatedBooleanType('update-kernel', 'Whether or not to update the kernel file.'))
-            ->add(new Input\NegatedBooleanType('update-routing', 'Whether or not to update the routing file.'))
-            ->add(new Input\BooleanType('structure', 'Whether or not to generate a complete bundle structure.'))
+            ->addOption('no-update-kernel', null, InputOption::VALUE_NONE, 'Do not update the kernel file')
+            ->addOption('no-update-routing', null, InputOption::VALUE_NONE, 'Do not update the routing file')
+            ->addOption('structure', null, InputOption::VALUE_NONE, 'Generate some default directories')
+            ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Name of the bundle')
+            ->addOption('folder', null, InputOption::VALUE_REQUIRED, 'Folder in which to generate the bundle', 'src/')
+            ->addArgument('namespace', InputArgument::REQUIRED)
         ;
     }
 
-    public function prepareValues(InputResult $input)
+    /**
+     * {@inheritdoc}
+     */
+    public function getConstraints()
     {
-        if (!$input->hasValue('name')) {
-            $input->name = str_replace('\\', '', $input->namespace);
-        }
-
-        $input->root = $this->container->getParameter('kernel.root_dir') . '/../';
-        $input->basedir = $input->root . $input->folder;
-        $input['kernel-file'] = $this->container->getParameter('kernel.root_dir') . '/AppKernel.php';
-        $input['routing-file'] = $this->container->getParameter('kernel.root_dir') . '/config/routing.yml';
-
-        $input->basename = substr($input->name, 0, -6);
-        $input['alias'] = Container::underscore($input->basename);
-
-        $input->dir = $input->basedir . str_replace('\\', '/', $input->namespace) . '/';
+        return [
+            'namespace' => [
+                new Constraints\NotBlank(),
+                new Constraints\Type(['type' => 'string']),
+                new GeneratorConstraints\BundleNamespace(),
+            ],
+            'name' => [
+                new Constraints\NotBlank(),
+                new Constraints\Type(['type' => 'string']),
+                new GeneratorConstraints\BundleName(),
+            ],
+            'folder' => [
+                new Constraints\NotBlank(),
+                new Constraints\Type(['type' => 'string']),
+                new GeneratorConstraints\Path(),
+            ],
+            'update-kernel' => [
+                new Constraints\Type(['type' => 'bool']),
+            ],
+            'update-routing' => [
+                new Constraints\Type(['type' => 'bool']),
+            ],
+            'structure' => [
+                new Constraints\Type(['type' => 'bool']),
+            ],
+        ];
     }
 
-    public function generate(InputResult $input, OutputInterface $output)
+    /**
+     * Retrieve a standard namespace name.
+     * @param string $namespace
+     * @return string
+     */
+    private function getNameForNamespace($namespace)
     {
-        $this->builder->mkdir($input->dir);
-        $this->builder->in($input->dir, function (BuilderInterface $builder) use ($input) {
-            $builder->template('Bundle.php.twig', "{$input->name}.php");
-            $builder->in('DependencyInjection', function (BuilderInterface $builder) use ($input) {
+        return str_replace(['/', '\\'], '', $namespace);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function before(Arguments $arguments)
+    {
+        if (!isset($arguments['update-kernel'])) {
+            $arguments['update-kernel'] = !$arguments->get('no-update-kernel', false);
+        }
+
+        if (!isset($arguments['update-routing'])) {
+            $arguments['update-routing'] = !$arguments->get('no-update-routing', false);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function interact(Arguments $arguments, Questioner $questioner)
+    {
+        $questioner->update($arguments, 'namespace', 'namespace');
+
+        $questioner->update($arguments, 'name', 'string', [
+            'default' => $this->getNameForNamespace($arguments['namespace']),
+            'description' => ''
+        ]);
+
+        $questioner->update($arguments, 'update-kernel', 'boolean', [
+            'force' => true,
+        ]);
+        $questioner->update($arguments, 'update-routing', 'boolean', [
+            'force' => true,
+        ]);
+
+        $questioner->update($arguments, 'structure', 'boolean', [
+            'force' => true,
+            'prompt' => 'Generate bundle structure?'
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function beforeValidate(Arguments $arguments)
+    {
+        $arguments['namespace'] = str_replace('/', '\\', $arguments['namespace']);
+
+        if (!isset($arguments['name']) && isset($arguments['namespace'])) {
+            $arguments['name'] = $this->getNameForNamespace($arguments['namespace']);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function beforeGenerate(Arguments $arguments)
+    {
+        $folder = $arguments['folder'];
+        $last = strlen($folder) - 1;
+        if ($folder[$last] !== '/' && $folder[$last] !== '\\') {
+            $folder .= '/';
+        }
+
+        $arguments['dir'] = $folder . str_replace('\\', '/', $arguments['namespace']) . '/';
+        $arguments['basename'] = substr($arguments['name'], 0, -6);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generate(Arguments $arguments, BuilderInterface $builder, GeneratorDispatcherInterface $dispatcher)
+    {
+        $builder->mkdir($arguments['dir']);
+        $builder->in($arguments['dir'], function (BuilderInterface $builder) use ($arguments) {
+            $builder->template('Bundle.php.twig', "{$arguments->name}.php");
+            $builder->in('DependencyInjection', function (BuilderInterface $builder) use ($arguments) {
                 $builder->template('Configuration.php.twig', 'Configuration.php');
-                $builder->template('Extension.php.twig', "{$input->basename}Extension.php");
+                $builder->template('Extension.php.twig', "{$arguments['basename']}Extension.php");
             });
 
-            $builder->in('Resources/config', function (BuilderInterface $builder) use ($input) {
-                 $builder->template('services.yml.twig', 'services.yml');
+            $builder->in('Resources/config', function (BuilderInterface $builder) use ($arguments) {
+                $builder->template('services.yml.twig', 'services.yml');
             });
 
             $builder->mkdir('Controller');
             $builder->mkdir('Resources/views');
 
-            if ($input->structure) {
+            if ($arguments['structure']) {
                 $builder->mkdir('Resources/public');
                 $builder->mkdir('Resources/doc');
                 $builder->mkdir('Resources/js');
@@ -118,10 +172,12 @@ class BundleGenerator extends AbstractGenerator
             }
         });
 
-        if ($input['update-kernel']) {
-            $this->builder->modify('app/AppKernel.php')
-                ->after('Symfony\\')
-                ->prepend('Blaat\\');
+        if ($arguments['update-kernel']) {
+            // TODO: update app/AppKernel.php
+        }
+
+        if ($arguments['update-routing']) {
+            // TODO: update app/config/routing.yml
         }
     }
 }

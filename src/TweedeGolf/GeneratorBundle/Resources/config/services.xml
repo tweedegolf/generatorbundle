@@ -4,54 +4,42 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <parameters>
-        <parameter key="tweedegolf_generator.generator_registry.class">TweedeGolf\GeneratorBundle\Generator\Registry\GeneratorRegistry</parameter>
-        <parameter key="tweedegolf_generator.generator.bundle.class">TweedeGolf\GeneratorBundle\Generator\BundleGenerator</parameter>
-        <parameter key="tweedegolf_generator.builder_registry.class">TweedeGolf\GeneratorBundle\Generator\Builder\Registry\BuilderRegistry</parameter>
-        <parameter key="tweedegolf_generator.builder.create.class">TweedeGolf\GeneratorBundle\Generator\Builder\Builder</parameter>
-        <parameter key="tweedegolf_generator.builder.destroy.class">TweedeGolf\GeneratorBundle\Generator\Builder\RevertingBuilder</parameter>
+        <parameter key="tweedegolf_generator.builder.class">TweedeGolf\Generator\Builder\Builder</parameter>
+        <parameter key="tweedegolf_generator.resource_locator.class">TweedeGolf\GeneratorBundle\ResourceLocator\SymfonyResourceLocator</parameter>
+        <parameter key="tweedegolf_generator.generator_registry.class">TweedeGolf\GeneratorBundle\Registry\SymfonyGeneratorRegistry</parameter>
+        <parameter key="tweedegolf_generator.dispatcher.class">TweedeGolf\Generator\Dispatcher\GeneratorDispatcher</parameter>
+        <parameter key="tweedegolf_generator.command.generate.class">TweedeGolf\Generator\Console\GenerateCommand</parameter>
+        <parameter key="tweedegolf_generator.input_type_registry.class">TweedeGolf\Generator\Console\Input\Registry\InputTypeRegistry</parameter>
     </parameters>
 
     <services>
-        <!-- builder registry -->
-        <service id="tweedegolf_generator.builder_registry" class="%tweedegolf_generator.builder_registry.class%" />
-
-        <!-- abstract builder -->
-        <service id="tweedegolf_generator.builder.abstract" abstract="true">
-            <call method="setBasePath">
-                <argument>%kernel.root_dir%/..</argument>
-            </call>
-            <call method="setFilesystem">
-                <argument type="service" id="filesystem" />
-            </call>
-            <call method="setKernel">
-                <argument type="service" id="kernel" />
-            </call>
+        <service id="tweedegolf_generator.resource_locator" class="%tweedegolf_generator.resource_locator.class%">
+            <argument type="service" id="kernel" />
+        </service>
+        <service id="tweedegolf_generator.builder" class="%tweedegolf_generator.builder.class%">
+            <argument type="service" id="tweedegolf_generator.resource_locator" />
         </service>
 
-        <!-- builders -->
-        <service id="tweedegolf_generator.builder.create" class="%tweedegolf_generator.builder.create.class%" parent="tweedegolf_generator.builder.abstract">
-            <tag name="tweedegolf_generator.builder" type="create" />
-        </service>
-        <service id="tweedegolf_generator.builder.destroy" class="%tweedegolf_generator.builder.destroy.class%" parent="tweedegolf_generator.builder.abstract">
-            <tag name="tweedegolf_generator.builder" type="destroy" />
-        </service>
-
-        <!-- generator registry -->
-        <service id="tweedegolf_generator.generator_registry" class="%tweedegolf_generator.generator_registry.class%" />
-
-        <!-- abstract generator -->
-        <service id="tweedegolf_generator.generator.abstract" abstract="true">
+        <service id="tweedegolf_generator.generator_registry" class="%tweedegolf_generator.generator_registry.class%" public="false">
             <call method="setContainer">
                 <argument type="service" id="service_container" />
             </call>
         </service>
 
-        <!-- generators -->
-        <service id="tweedegolf_generator.generator.bundle" class="%tweedegolf_generator.generator.bundle.class%" parent="tweedegolf_generator.generator.abstract">
-            <call method="setBundle">
-                <argument>TweedeGolfGeneratorBundle</argument>
+        <service id="tweedegolf_generator.input_type_registry" class="%tweedegolf_generator.input_type_registry.class%" />
+
+        <service id="tweedegolf_generator.dispatcher" class="%tweedegolf_generator.dispatcher.class%">
+            <argument type="service" id="tweedegolf_generator.builder" />
+            <argument type="service" id="tweedegolf_generator.generator_registry" />
+            <argument type="service" id="tweedegolf_generator.input_type_registry" />
+            <argument type="service" id="validator" />
+        </service>
+
+        <service id="tweedegolf_generator.command.generate" class="%tweedegolf_generator.command.generate.class%">
+            <call method="setDispatcher">
+                <argument type="service" id="tweedegolf_generator.dispatcher" />
             </call>
-            <tag name="tweedegolf_generator.generator" />
+            <tag name="console.command" />
         </service>
     </services>
 </container>

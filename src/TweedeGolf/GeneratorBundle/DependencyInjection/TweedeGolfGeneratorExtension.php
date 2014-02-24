@@ -4,6 +4,7 @@ namespace TweedeGolf\GeneratorBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
@@ -24,5 +25,10 @@ class TweedeGolfGeneratorExtension extends Extension
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
+
+        if ($config['autoload_bundles'] && $container->hasDefinition('tweedegolf_generator.generator_registry')) {
+            $definition = $container->getDefinition('tweedegolf_generator.generator_registry');
+            $definition->addMethodCall('loadBundleGenerators', [new Reference('kernel')]);
+        }
     }
 }
