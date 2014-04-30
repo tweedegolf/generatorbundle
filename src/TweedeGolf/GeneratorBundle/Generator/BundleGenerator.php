@@ -203,23 +203,35 @@ class BundleGenerator extends AbstractGenerator
             $builder->mkdir('Resources/views');
 
             if ($arguments['structure']) {
-                $builder->mkdir('Resources/public');
                 $builder->mkdir('Resources/doc');
-                $builder->mkdir('Resources/js');
                 $builder->mkdir('Resources/translations');
                 $builder->touch('Resources/translations/messages.nl.po');
-                $builder->mkdir('Tests');
                 $builder->mkdir('Entity');
                 $builder->mkdir('Form');
             }
         });
 
         if ($arguments['update-kernel']) {
-            // TODO: update app/AppKernel.php
+            $bundleClass = "{$arguments['namespace']}\\{$arguments['name']}";
+            $builder->modify('app/AppKernel.php', function ($content) use ($bundleClass) {
+                $count = preg_match("#([\t ]+)// project bundles\n#", $content, $matches, PREG_OFFSET_CAPTURE);
+                if ($count === 1) {
+                    $match = $matches[0];
+                    $at = strlen($match[0]) + $match[1];
+
+                    $spaces = $matches[1][0];
+                    $content = substr($content, 0, $at) . "{$spaces}new {$bundleClass}(),\n" . substr($content, $at);
+                }
+                return $content;
+            });
         }
 
         if ($arguments['update-routing']) {
-            // TODO: update app/config/routing.yml
+            $builder->prepend('app/config/routing.yml', "{$arguments['alias']}:
+    resource: \"@{$arguments['name']}/Controller/\"
+    type:     annotation
+    prefix:   /\n\n"
+            );
         }
     }
 }
