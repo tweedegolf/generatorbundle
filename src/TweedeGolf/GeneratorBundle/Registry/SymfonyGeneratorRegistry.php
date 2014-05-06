@@ -8,6 +8,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
+use TweedeGolf\Generator\GeneratorInterface;
 use TweedeGolf\Generator\Registry\GeneratorRegistry;
 
 class SymfonyGeneratorRegistry extends GeneratorRegistry implements ContainerAwareInterface
@@ -85,5 +86,16 @@ class SymfonyGeneratorRegistry extends GeneratorRegistry implements ContainerAwa
         ) {
             $this->addGenerator($r->newInstance());
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addGenerator(GeneratorInterface $generator, $priority = 1)
+    {
+        if ($generator instanceof ContainerAwareInterface) {
+            $generator->setContainer($this->container);
+        }
+        parent::addGenerator($generator, $priority);
     }
 }
